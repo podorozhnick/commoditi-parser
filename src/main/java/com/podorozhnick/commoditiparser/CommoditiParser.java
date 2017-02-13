@@ -24,7 +24,9 @@ public class CommoditiParser {
     private static final String HOUSE_RGX = "будинок ";
     private static final String AREA_RGX = "загальна площа ";
     private static final String FLOOR_RGX = "поверх ";
-    private static final String END_RGX = "[/s,]";
+    private static final String END_RGX = "[\\s,]";
+    private static final String COMMA = ",";
+    private static final String POINT = ".";
 
     public Set<FlatSale> parse(String input, String companyName) {
         Set<FlatSale> flatSaleList = new HashSet<>();
@@ -79,7 +81,7 @@ public class CommoditiParser {
         }
         int flat = Integer.parseInt(lotName.split(FLAT_RGX)[1].split(END_RGX)[0]);
         int house = Integer.parseInt(lotName.split(HOUSE_RGX)[1]);
-        double area = Double.parseDouble(lotName.split(AREA_RGX)[1].split(END_RGX)[0]);
+        double area = Double.parseDouble(lotName.split(AREA_RGX)[1].replace(COMMA, POINT).split(END_RGX)[0]);
         int floor = Integer.parseInt(lotName.split(FLOOR_RGX)[1].split(END_RGX)[0]);
         flatSale.setAuctionNumber(auctionNumber);
         flatSale.setLotNumber(lotNumber);
