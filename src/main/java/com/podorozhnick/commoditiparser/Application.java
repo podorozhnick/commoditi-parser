@@ -35,6 +35,7 @@ public class Application {
             String json = new Gson().toJson(flatSales);
             new FileSaver(json, fileName).save();
         }
+        System.out.println(flatSales.size());
     }
 
     private static void printSales(Collection<FlatSale> flatSales) {

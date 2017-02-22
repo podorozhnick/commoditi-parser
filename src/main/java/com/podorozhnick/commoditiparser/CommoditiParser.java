@@ -20,7 +20,7 @@ public class CommoditiParser {
     private static final String COMMA_HTML = "&#160;";
     private static final String EMPTY_STRING = "";
     private static final String LIVING_FLAT_TYPE = "Продаж майнових прав на нерухоме майно";
-    private static final String FLAT_RGX = "(квартиру № |Квартира № )";
+    private static final String FLAT_RGX = "(иру № |ира № )";
     private static final String HOUSE_RGX = "будинок ";
     private static final String AREA_RGX = "загальна площа ";
     private static final String FLOOR_RGX = "поверх ";
