@@ -8,40 +8,20 @@ import java.util.*;
 public class CommoditiConnector {
 
     private static final String E_COMMODITY_URL = "http://e-commodity.fbp.com.ua/TradeForwards.aspx";
-    private static final String CONTENT_TYPE = "Content-Type";
-    private static final String APPLICATION_X_WWW_FORM_URLENCODED_CHARSET_UTF_8 = "application/x-www-form-urlencoded; charset=UTF-8";
-    private static final String CONTENT_LANGUAGE = "Content-Language";
-    private static final String CONTENT_LANG_VALUE = "ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4";
-    private static final String CONNECTION = "Connection";
-    private static final String CONNECTION_VALUE = "keep-alive";
-    private static final String EMPTY_STRING = "";
-    private static final String DATE_PATTERN = "yyyy-MM-dd";
     private static final int START_PAGE = 2;
-    private static final String PAGE = "Page$";
-    private static final String POST = "POST";
-    private static final String X_REQUESTED_WITH = "X-Requested-With";
-    private static final String XML_HTTP_REQUEST_VALUE = "XMLHttpRequest";
-    private static final String X_MICROSOFT_AJAX = "X-MicrosoftAjax";
-    private static final String X_MICROSOFT_AJAX_VALUE = "Delta=true";
-    private static final String CACHE_CONTROL = "Cache-Control";
-    private static final String CACHE_CONTROL_VALUE = "no-cache";
-    private static final String ACCEPT = "Accept";
-    private static final String ACCEPT_VALUE = "*/*";
-    private static final String REFERER = "Referer";
-    private static final String REFERER_VALUE = "http://e-commodity.fbp.com.ua/TradeForwards.aspx";
-    private static final String CONTENT_LENGTH = "Content-Length";
-    private static final String ACCEPT_ENCODING = "Accept-Encoding";
-    private static final String ACCEPT_ENCODING_VALUE = "gzip, deflate";
-    private static final String ORIGIN = "Origin";
-    private static final String ORIGIN_VALUE = "http://e-commodity.fbp.com.ua";
-    private static final String USER_AGENT = "User-Agent";
-    private static final String USER_AGENT_VALUE = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36";
+
     private static final String FIRST_PAGE_DATA_JSON_PATH = "data/refresh_data";
     private static final String PAGE_DATA_JSON_PATH = "data/page_data";
-    private static final String PAGE_EQUAL_PATTERN = "\\|hiddenField\\|";
+    private static final String PAGE_HEADER_JSON_PATH = "data/page_header";
+
+    private static final String DATE_PATTERN = "yyyy-MM-dd";
+    private static final String EMPTY_STRING = "";
+    private static final String PAGE = "Page$";
     private static final String STRAIGHT_RGX = "\\|";
+    private static final String PAGE_EQUAL_PATTERN = "\\|hiddenField\\|";
 
     private HttpURLConnection connection;
+    private RequestHeader requestHeader;
 
     private String firstPageRequest(Calendar calendar) {
         try {
@@ -124,12 +104,16 @@ public class CommoditiConnector {
         return getFormDataFromFile(FIRST_PAGE_DATA_JSON_PATH);
     }
 
+    private FormData getPageData() {
+        return getFormDataFromFile(PAGE_DATA_JSON_PATH);
+    }
+
     private FormData getFormDataFromFile(String filePath) {
         return new JsonFileReader<FormData>(filePath).read(FormData.class);
     }
 
-    private FormData getPageData() {
-        return getFormDataFromFile(PAGE_DATA_JSON_PATH);
+    private RequestHeader getHeaders() {
+        return new JsonFileReader<RequestHeader>(PAGE_HEADER_JSON_PATH).read(RequestHeader.class);
     }
 
     private void writeOutputToRequest(String urlParameters) throws IOException {
@@ -156,21 +140,29 @@ public class CommoditiConnector {
     }
 
     private void setHeaders(HttpURLConnection connection, int dataLength) throws ProtocolException {
-        connection.setRequestMethod(POST);
-        connection.setRequestProperty(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED_CHARSET_UTF_8);
-        connection.setRequestProperty(X_REQUESTED_WITH, XML_HTTP_REQUEST_VALUE);
-        connection.setRequestProperty(X_MICROSOFT_AJAX, X_MICROSOFT_AJAX_VALUE);
-        connection.setRequestProperty(CACHE_CONTROL, CACHE_CONTROL_VALUE);
-        connection.setRequestProperty(ACCEPT, ACCEPT_VALUE);
-        connection.setRequestProperty(REFERER, REFERER_VALUE);
-        connection.setRequestProperty(CONNECTION, CONNECTION_VALUE);
-        connection.setRequestProperty(CONTENT_LENGTH, Integer.toString(dataLength));
-        connection.setRequestProperty(CONTENT_LANGUAGE, CONTENT_LANG_VALUE);
-        connection.setRequestProperty(ACCEPT_ENCODING, ACCEPT_ENCODING_VALUE);
-        connection.setRequestProperty(ORIGIN, ORIGIN_VALUE);
-        connection.setRequestProperty(USER_AGENT, USER_AGENT_VALUE);
-        connection.setUseCaches(false);
-        connection.setDoOutput(true);
+        RequestHeader requestHeader = getRequestHeader();
+        requestHeader.setContentLength(Integer.toString(dataLength));
+        connection.setRequestMethod(requestHeader.getMethod());
+        connection.setRequestProperty(RequestHeader.CONTENT_TYPE, requestHeader.getContentType());
+        connection.setRequestProperty(RequestHeader.X_REQUESTED_WITH, requestHeader.getxRequestedWith());
+        connection.setRequestProperty(RequestHeader.X_MICROSOFT_AJAX, requestHeader.getxMicrosoftAjax());
+        connection.setRequestProperty(RequestHeader.CACHE_CONTROL, requestHeader.getCacheControl());
+        connection.setRequestProperty(RequestHeader.ACCEPT, requestHeader.getAccept());
+        connection.setRequestProperty(RequestHeader.REFERER, requestHeader.getReferer());
+        connection.setRequestProperty(RequestHeader.CONNECTION, requestHeader.getConnection());
+        connection.setRequestProperty(RequestHeader.CONTENT_LENGTH, requestHeader.getContentLength());
+        connection.setRequestProperty(RequestHeader.CONTENT_LANGUAGE, requestHeader.getContentLanguage());
+        connection.setRequestProperty(RequestHeader.ACCEPT_ENCODING, requestHeader.getAcceptEncoding());
+        connection.setRequestProperty(RequestHeader.ORIGIN, requestHeader.getOrigin());
+        connection.setRequestProperty(RequestHeader.USER_AGENT, requestHeader.getUserAgent());
+        connection.setUseCaches(requestHeader.getUseCaches());
+        connection.setDoOutput(requestHeader.getDoOutput());
     }
 
+    public RequestHeader getRequestHeader() {
+        if (this.requestHeader == null) {
+            this.requestHeader = getHeaders();
+        }
+        return requestHeader;
+    }
 }
