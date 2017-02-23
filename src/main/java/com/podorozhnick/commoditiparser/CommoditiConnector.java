@@ -39,6 +39,7 @@ public class CommoditiConnector {
     private static final String FIRST_PAGE_DATA_JSON_PATH = "data/refresh_data";
     private static final String PAGE_DATA_JSON_PATH = "data/page_data";
     private static final String PAGE_EQUAL_PATTERN = "\\|hiddenField\\|";
+    private static final String STRAIGHT_RGX = "\\|";
 
     private HttpURLConnection connection;
 
@@ -91,9 +92,25 @@ public class CommoditiConnector {
                     connection.disconnect();
                 }
             }
+            if (prevResp.contains(FormData.EVENT_VALIDATION)) {
+                pageData.setEventValidation(parseEventValidation(prevResp));
+                pageData.setViewState(parseViewState(prevResp));
+            }
             page++;
         }
         return pages;
+    }
+
+    private String parseEventValidation(String prevResp) {
+        String[] arr = prevResp.split(FormData.EVENT_VALIDATION + STRAIGHT_RGX);
+        String[] arr2 = arr[1].split(STRAIGHT_RGX);
+        return arr2[0];
+    }
+
+    private String parseViewState(String prevResp) {
+        String[] arr = prevResp.split(FormData.VIEW_STATE + STRAIGHT_RGX);
+        String[] arr2 = arr[1].split(STRAIGHT_RGX);
+        return arr2[0];
     }
 
     private void addDateToData(Calendar calendar, FormData firstPageData) {

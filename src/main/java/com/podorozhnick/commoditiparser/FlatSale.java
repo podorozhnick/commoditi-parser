@@ -157,6 +157,10 @@ public class FlatSale {
 
         FlatSale flatSale = (FlatSale) o;
 
+        if (getHouse() != flatSale.getHouse()) return false;
+        if (getFlat() != flatSale.getFlat()) return false;
+        if (getAuctionNumber() != null ? !getAuctionNumber().equals(flatSale.getAuctionNumber()) : flatSale.getAuctionNumber() != null)
+            return false;
         if (getLotNumber() != null ? !getLotNumber().equals(flatSale.getLotNumber()) : flatSale.getLotNumber() != null)
             return false;
         return getContractNumber() != null ? getContractNumber().equals(flatSale.getContractNumber()) : flatSale.getContractNumber() == null;
@@ -164,8 +168,11 @@ public class FlatSale {
 
     @Override
     public int hashCode() {
-        int result = getLotNumber() != null ? getLotNumber().hashCode() : 0;
+        int result = getAuctionNumber() != null ? getAuctionNumber().hashCode() : 0;
+        result = 31 * result + (getLotNumber() != null ? getLotNumber().hashCode() : 0);
         result = 31 * result + (getContractNumber() != null ? getContractNumber().hashCode() : 0);
+        result = 31 * result + getHouse();
+        result = 31 * result + getFlat();
         return result;
     }
 
