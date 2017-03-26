@@ -20,9 +20,9 @@ public class CommoditiParser {
     private static final String COMMA_HTML = "&#160;";
     private static final String EMPTY_STRING = "";
     private static final String LIVING_FLAT_TYPE = "Продаж майнових прав на нерухоме майно";
-    private static final String FLAT_RGX = "(иру № |ира № )";
+    private static final String FLAT_RGX = "(иру №|ира №)( |)";
     private static final String HOUSE_RGX = "будинок ";
-    private static final String AREA_RGX = "загальна площа ";
+    private static final String AREA_RGX = "загальн(а|ою) площ(а|ею) ";
     private static final String FLOOR_RGX = "поверх ";
     private static final String END_RGX = "[\\s,]";
     private static final String COMMA = ",";
@@ -80,7 +80,7 @@ public class CommoditiParser {
             isLast = false;
         }
         int flat = Integer.parseInt(lotName.split(FLAT_RGX)[1].split(END_RGX)[0]);
-        int house = Integer.parseInt(lotName.split(HOUSE_RGX)[1]);
+        int house = Integer.parseInt(lotName.split(HOUSE_RGX)[1].split(END_RGX)[0]);
         double area = Double.parseDouble(lotName.split(AREA_RGX)[1].replace(COMMA, POINT).split(END_RGX)[0]);
         int floor = Integer.parseInt(lotName.split(FLOOR_RGX)[1].split(END_RGX)[0]);
         flatSale.setAuctionNumber(auctionNumber);
