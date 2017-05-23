@@ -47,12 +47,14 @@ public class CommoditiConnector {
                 calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.YEAR)));
         List<String> pages = new ArrayList<>();
         String firstPage = firstPageRequest(calendar);
+        System.out.println("Page 0");
         pages.add(firstPage);
         String prevResp = firstPage;
         FormData pageData = getPageData();
         addDateToData(calendar, pageData);
         int page = START_PAGE;
         while (true) {
+            System.out.println("Page " + page);
             addPageToData(page, pageData);
             try {
                 URL url = new URL(E_COMMODITY_URL);
