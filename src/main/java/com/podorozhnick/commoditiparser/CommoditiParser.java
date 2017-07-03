@@ -21,12 +21,13 @@ public class CommoditiParser {
     private static final String EMPTY_STRING = "";
     private static final String LIVING_FLAT_TYPE = "Продаж майнових прав на нерухоме майно";
     private static final String FLAT_RGX = "(иру №|ира №)( |)";
-    private static final String HOUSE_RGX = "будинок\\s+";
+    private static final String HOUSE_RGX = "(будинок|буд.)\\s+";
     private static final String AREA_RGX = "загальн(а|ою) площ(а|ею) ";
     private static final String FLOOR_RGX = "поверх ";
     private static final String END_RGX = "[\\s,]";
     private static final String COMMA = ",";
     private static final String POINT = ".";
+    private static final String PANTRY_LABEL = "Нежитлове приміщення";
 
     public Set<FlatSale> parse(String input, String companyName) {
         Set<FlatSale> flatSaleList = new HashSet<>();
@@ -79,10 +80,14 @@ public class CommoditiParser {
         if (categoryName.equals(LIVING_FLAT_TYPE)) {
             isLast = false;
         }
-        int flat = Integer.parseInt(lotName.split(FLAT_RGX)[1].split(END_RGX)[0]);
+        int flat = 0;
+        int floor = 0;
+        if (!lotName.contains(PANTRY_LABEL)) {
+            flat = Integer.parseInt(lotName.split(FLAT_RGX)[1].split(END_RGX)[0]);
+            floor = Integer.parseInt(lotName.split(FLOOR_RGX)[1].split(END_RGX)[0]);
+        }
         int house = Integer.parseInt(lotName.split(HOUSE_RGX)[1].split(END_RGX)[0]);
         double area = Double.parseDouble(lotName.split(AREA_RGX)[1].replace(COMMA, POINT).split(END_RGX)[0]);
-        int floor = Integer.parseInt(lotName.split(FLOOR_RGX)[1].split(END_RGX)[0]);
         flatSale.setAuctionNumber(auctionNumber);
         flatSale.setLotNumber(lotNumber);
         flatSale.setDate(date);
